@@ -1,0 +1,99 @@
+
+### Login local
+POST http://127.0.0.1/php_login_server/login
+Content-Type: application/json
+
+{
+  "login": "Ivan",
+  "password": "1223"
+}
+###
+
+
+### Register new user local
+POST http://127.0.0.1/php_login_server/register
+Content-Type: application/json
+
+{
+  "login": "Ivan",
+  "password": "123",
+  "email": "test@yandex.ru",
+  "user_type": "customer"
+}
+###
+
+###
+POST http://127.0.0.1/php_login_server/register
+Content-Type: application/json
+
+{
+  "login": "Petr",
+  "password": "333",
+  "email": "test@Aandex.ru",
+  "user_type": "contractor"
+}
+###
+
+
+### Create task
+POST http://127.0.0.1/php_login_server/create_task
+Content-Type: application/json
+
+{
+  "login": "Ivan",
+  "task_info": {
+    "contractor": "Petr",
+    "task_name": "task_1",
+    "task_desc": "This is initial task",
+    "date": "2021-03-19",
+    "status": "in_progress"
+  }
+}
+
+
+### Create team for customer.
+POST http://127.0.0.1/php_login_server/create_team
+Content-Type: application/json
+
+{
+  "name": "useless_team",
+  "customer": "Ivan"
+}
+###
+
+POST http://127.0.0.1/php_login_server/check_team
+Content-Type: application/json
+
+{
+  "team_name": "test_team",
+  "username": "Ivan"
+}
+###
+
+###
+POST http://127.0.0.1/php_login_server/get_tasks
+Content-Type: application/json
+
+{
+  "username": "Petr"
+}
+###
+
+###
+POST http://127.0.0.1/php_login_server/add_team
+Content-Type: application/json
+
+{
+  "username": "Petr",
+  "team_name": "useless_team"
+}
+###
+
+POST http://127.0.0.1/php_login_server/change_status
+Content-Type: application/json
+
+{
+  "task_name": "task_1",
+  "status": "cool"
+}
+###

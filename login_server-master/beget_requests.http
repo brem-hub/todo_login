@@ -1,0 +1,106 @@
+
+### Login server (beget)
+POST http://bremka.beget.tech/login
+Content-Type: application/json
+
+{
+  "login": "Ivan",
+  "password": "123"
+}
+###
+
+
+### Register new customer user (beget)
+POST http://bremka.beget.tech/register
+Content-Type: application/json
+
+{
+  "login": "Ivan",
+  "password": "123",
+  "email": "test@yandex.ru",
+  "user_type": "customer"
+}
+###
+
+### Register new contractor user (beget)
+POST http://bremka.beget.tech/register
+Content-Type: application/json
+
+{
+  "login": "Petr",
+  "password": "333",
+  "email": "test@Aandex.ru",
+  "user_type": "contractor"
+}
+###
+
+
+### Create new task (beget)
+POST http://bremka.beget.tech/create_task
+Content-Type: application/json
+
+{
+  "login": "Ivan",
+  "task_info": {
+    "contractor": "Petr",
+    "task_name": "task_1",
+    "description": "This is initial task",
+    "date": "2021-03-19",
+    "status": "in_progress"
+  }
+}
+###
+
+
+### Create team for customer (beget)
+POST http://bremka.beget.tech/create_team
+Content-Type: application/json
+
+{
+  "name": "useless_team",
+  "customer": "Ivan"
+}
+###
+
+
+### Check if user is in the team (beget)
+POST http://bremka.beget.tech/check_team
+Content-Type: application/json
+
+{
+  "team_name": "test_team",
+  "username": "Ivan"
+}
+###
+
+
+### Get tasks for chosen user (beget)
+POST http://bremka.beget.tech/get_tasks
+Content-Type: application/json
+
+{
+  "username": "Petr"
+}
+###
+
+
+### Add user to the team (beget)
+POST http://bremka.beget.tech/add_team
+Content-Type: application/json
+
+{
+  "username": "Petr",
+  "team_name": "useless_team"
+}
+###
+
+
+### Change status of the task (beget)
+POST http://bremka.beget.tech/change_status
+Content-Type: application/json
+
+{
+  "task_name": "task_1",
+  "status": "cool"
+}
+###

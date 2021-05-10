@@ -1,0 +1,159 @@
+POST http://127.0.0.1/todo/public/login
+Content-Type: application/json
+
+{
+  "userLogin": "keks",
+  "userPassword": "123"
+}
+
+###
+
+POST http://127.0.0.1/todo/public/register
+Content-Type: application/json
+
+{
+  "userLogin": "work_cont",
+  "userPassword": "123",
+  "userEmail": "kek@gmail.com",
+  "userType": "contractor"
+
+}
+
+###
+
+POST http://127.0.0.1/todo/public/register
+Content-Type: application/json
+
+{
+  "userLogin": "cont#2",
+  "userPassword": "123",
+  "userEmail": "kek@gmail.com",
+  "userType": "contractor"
+
+}
+
+###
+
+POST http://127.0.0.1/todo/public/register
+Content-Type: application/json
+
+{
+"userLogin": "cont#3",
+"userPassword": "123",
+"userEmail": "kek@gmail.com",
+"userType": "contractor"
+
+}
+
+###
+
+
+POST http://127.0.0.1/todo/public/create-task
+Content-Type: application/json
+
+{
+  "customerLogin": "work_customer",
+  "taskInfo": {
+    "title": "work_task#2",
+    "finishDate": "2025-04-30",
+    "status": "initiated"
+  }
+}
+
+###
+
+POST http://127.0.0.1/todo/public/create-team
+Content-Type: application/json
+
+{
+"customerLogin": "work_customer",
+"teamInfo": {
+  "title": "work_team",
+  "description": "My fav team"
+}
+}
+
+###
+
+#CUSTOMER IS NOT IN ITS OWN TEAM!!!
+POST http://127.0.0.1/todo/public/check-team
+Content-Type: application/json
+
+{
+  "userLogin": "keks",
+  "teamName": "TheBestTeam"
+}
+
+###
+
+POST http://127.0.0.1/todo/public/get-tasks
+Content-Type: application/json
+
+{
+  "userLogin": "keks"
+}
+
+###
+
+
+POST http://127.0.0.1/todo/public/change-status
+Content-Type: application/json
+
+{
+  "taskTitle": "The best",
+  "newStatus": "fucked"
+}
+
+###
+
+POST http://127.0.0.1/todo/public/get-task
+Content-Type: application/json
+
+{
+  "taskTitle": "The besst"
+}
+
+###
+
+POST http://127.0.0.1/todo/public/assign-team
+Content-Type: application/json
+
+{
+  "userLogin": "work_cont",
+  "teamTitle": "work_team"
+}
+
+###
+
+POST http://127.0.0.1/todo/public/delete-cont-team
+Content-Type: application/json
+
+{
+  "userLogin": "cont",
+  "teamTitle": "test#1"
+}
+
+###
+
+POST http://127.0.0.1/todo/public/contractors-by-customer
+Content-Type: application/json
+
+{
+  "userLogin": "cus"
+}
+
+###
+
+
+POST http://127.0.0.1/todo/public/assign-task
+Content-Type: application/json
+
+{
+  "userLogin": "work_cont",
+  "taskTitle": "work_task#2"
+}
+
+###
+
+
+
