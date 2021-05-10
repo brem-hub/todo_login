@@ -16,6 +16,8 @@ API доступен по адресу url/[action].
 11. [Change status of the task](#change-status-of-the-task)
 12. [Delete the contractor from the team](#delete-the-contractor-from-the-team)
 13. [Get contractors of the customer](#get-contractors-of-the-customer)
+14. [Recover password](#recover-password)
+15. [Change password](#change-password)
 
 ### Setup
 All requests return __json__ answer
