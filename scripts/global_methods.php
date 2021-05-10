@@ -45,7 +45,7 @@ function add_json_status_and_custom(Response $response, bool|int $status, array 
     return $response;
 }
 
-function &add_json_status(Response $response, $status){
+function add_json_status(Response $response, $status){
     $response->getBody()->write(json_encode(
         array(
             'status' => $status,

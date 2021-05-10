@@ -13,14 +13,10 @@ require __DIR__ . '/../scripts/global_methods.php';
 $sql_manager = new SqlManager("localhost", "root", "root", "todo");
 
 $app = AppFactory::create();
+//TODO: Change on deploy!!!
 $app->setBasePath('/todo/public');
 $app->addBodyParsingMiddleware();
 $app->addRoutingMiddleware();
-
-$app->get("/test", function (Request $request, Response $response) use($sql_manager){
-
-    $args = $request->getQueryParams();
-});
 
 $app->post('/login', function (Request $request, Response $response) use($sql_manager){
 
@@ -38,7 +34,7 @@ $app->post('/login', function (Request $request, Response $response) use($sql_ma
 
     $hashed_password = $user['hashed_password'];
     if (password_verify($password, $hashed_password))
-        return add_json_status_and_custom($response, 1, array("type" => $user['type']));
+        return add_json_status_and_custom($response, 1, array($user['type']));
 
     return add_json_status_and_comment($response, 0, DefaultMessages::E_WRONG_PASS);
 });
@@ -83,7 +79,7 @@ $app->post('/create-task', function (Request $request, Response $response) use($
     if ($res !== true)
         return add_json_status_and_comment($response, 0, $res);
     else
-        return add_json_status_and_comment($response, 1, "Task created");
+        return add_json_status($response, 1);
 });
 
 
@@ -120,20 +116,20 @@ $app->post('/create-team', function (Request $request, Response $response) use($
     if ($res !== true)
         return add_json_status_and_comment($response, 0, $res);
     else
-        return add_json_status_and_comment($response,1, "Team was created");
+        return add_json_status($response, 1);
 });
 
 $app->post('/check-team', function (Request $request, Response $response) use($sql_manager){
    $args = (array)$request->getParsedBody();
 
    $username = $args['userLogin'];
-   $team = $args['teamName'];
+   $team = $args['teamTitle'];
 
    if (!check_params($username, $team)) return add_json_status_and_comment($response, 0, DefaultMessages::E_WRONG_PARAMS);
 
    $res = $sql_manager->check_user_in_team($username, $team);
    if (is_bool($res))
-       return add_json_status_and_comment($response, 1, $res ? 1: 0);
+       return add_json_status_and_custom($response, 1, array($res ? 1: 0));
    else
        return add_json_status_and_comment($response, 0, $res);
 
@@ -149,10 +145,11 @@ $app->post('/get-task', function (Request $request, Response $response) use($sql
     $task = $sql_manager->get_task_wrapper($task_title);
 
     if (is_string($task)) return add_json_status_and_comment($response, 0, $task);
-    if (is_null($task) or count($task) == 0) return add_json_status_and_comment($response, 1, "Task does not exist");
+    if (is_null($task) or count($task) == 0) return add_json_status_and_comment($response, 0, "Task does not exist");
 
-    $response->getBody()->write(json_encode(array_values($task)));
-    return $response;
+    return add_json_status_and_custom($response, 1, array(array_values($task)));
+    /*$response->getBody()->write(json_encode(array_values($task)));
+    return $response;*/
 });
 
 
@@ -166,10 +163,10 @@ $app->post('/get-tasks', function (Request $request, Response $response) use($sq
     $tasks = $sql_manager->get_tasks($username);
     if ($tasks[0] == false) return add_json_status_and_comment($response, 0, $tasks[1]);
 
-    if (count($tasks[1]) == 0)
-        return add_json_status_and_comment($response, 1, "Tasks not found");
-    $response->getBody()->write(json_encode(array_values($tasks[1])));
-    return $response;
+    if (count($tasks[1]) == 0) return add_json_status_and_comment($response, 0, "Tasks not found");
+    return add_json_status_and_custom($response, 1, $tasks[1]);
+   /* $response->getBody()->write(json_encode(array_values($tasks[1])));
+    return $response;*/
 });
 
 $app->post('/assign-team', function (Request $request, Response $response) use ($sql_manager){
@@ -199,7 +196,8 @@ $app->post('/change-status', function (Request $request, Response $response) use
 
     $res =$sql_manager->change_task_type($task_name, $status);
     if (is_string($res)) return add_json_status_and_comment($response, 0, $res);
-        return add_json_status($response, (int)$res);
+
+    return add_json_status_and_custom($response, 1, array((int)$res));
 });
 
 $app->post('/delete-cont-team', function (Request $request, Response $response) use($sql_manager){
@@ -213,8 +211,7 @@ $app->post('/delete-cont-team', function (Request $request, Response $response) 
 
     $res = $sql_manager->delete_contractor_from_team($user_login, $team_title);
     if (is_string($res)) return add_json_status_and_comment($response, 0, $res);
-    var_dump($res);
-    return add_json_status($response, (int)$res);
+    return add_json_status_and_custom($response, 1, array((int)$res));
 });
 
 $app->post('/contractors-by-customer', function (Request $request, Response $response) use($sql_manager){
