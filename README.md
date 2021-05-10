@@ -5,7 +5,6 @@ API доступен по адресу url/[action].
 
 ## Contents
 1. [Login](#login)
-2. [Test](#test)
 3. [Register](#register)
 4. [Create new task](#create-new-task)
 5. [Assign task](#assign-task)
