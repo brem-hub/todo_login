@@ -25,6 +25,7 @@ class ComposerStaticInitd3061c90b2e95192692b1e913fc48281
             'Psr\\Http\\Server\\' => 16,
             'Psr\\Http\\Message\\' => 17,
             'Psr\\Container\\' => 14,
+            'PHPMailer\\PHPMailer\\' => 20,
         ),
         'F' => 
         array (
@@ -64,6 +65,10 @@ class ComposerStaticInitd3061c90b2e95192692b1e913fc48281
         array (
             0 => __DIR__ . '/..' . '/psr/container/src',
         ),
+        'PHPMailer\\PHPMailer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
+        ),
         'Fig\\Http\\Message\\' => 
         array (
             0 => __DIR__ . '/..' . '/fig/http-message-util/src',
@@ -71,16 +76,6 @@ class ComposerStaticInitd3061c90b2e95192692b1e913fc48281
         'FastRoute\\' => 
         array (
             0 => __DIR__ . '/..' . '/nikic/fast-route/src',
-        ),
-    );
-
-    public static $prefixesPsr0 = array (
-        'S' => 
-        array (
-            'Slim' => 
-            array (
-                0 => __DIR__ . '/..' . '/slim/middleware/src',
-            ),
         ),
     );
 
@@ -97,7 +92,6 @@ class ComposerStaticInitd3061c90b2e95192692b1e913fc48281
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInitd3061c90b2e95192692b1e913fc48281::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInitd3061c90b2e95192692b1e913fc48281::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInitd3061c90b2e95192692b1e913fc48281::$prefixesPsr0;
             $loader->classMap = ComposerStaticInitd3061c90b2e95192692b1e913fc48281::$classMap;
 
         }, null, ClassLoader::class);

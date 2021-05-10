@@ -308,3 +308,44 @@ or
 }
 ```
 
+### Recover password
+#### Request
+```http request
+POST http://<url>/recover-password
+Content-Type: application/json
+
+{
+  "userLogin": "user login",
+}
+```
+#### Return
+```json
+{
+  "status": 1 / 0
+}
+```
+
+### Change password
+#### Request
+```http request
+POST http://<url>/change-password
+Content-Type: application/json
+
+{
+  "userLogin": "user login",
+  "newPassword": "new password"
+}
+```
+#### Return
+```json
+{
+  "status": 1
+}
+or
+{
+  "status": 0,
+  "comment": "error message"
+}
+```
+
+

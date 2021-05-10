@@ -478,6 +478,24 @@ class SqlManager
         return array(true, $contractors_arr);
     }
 
+    public function set_new_password($user_login, $new_password){
+
+        $query = self::query_set_table_names('UPDATE __l_users__ SET hashed_password = :password WHERE login = :login');
+
+        $params = [
+            ":login" => $user_login,
+            ":password" => $new_password
+        ];
+
+        $stmt = $this->connection->prepare($query);
+
+        if (!$stmt->execute($params))
+            return $stmt->errorInfo();
+
+        if ($stmt->rowCount() != 0) return true;
+        return false;
+    }
+
 
     /**
      * @param $query

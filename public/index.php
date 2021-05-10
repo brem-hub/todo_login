@@ -4,11 +4,11 @@ use Slim\Factory\AppFactory;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 
-
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../scripts/debugging.php';
 require __DIR__ . '/../scripts/SqlManager.php';
 require __DIR__ . '/../scripts/global_methods.php';
+require __DIR__ . '/../scripts/Mailer.php';
 
 $sql_manager = new SqlManager("localhost", "root", "root", "todo");
 
@@ -226,6 +226,50 @@ $app->post('/contractors-by-customer', function (Request $request, Response $res
     if ($res[0] == false) return add_json_status_and_comment($response, 0, $res[1]);
 
     return add_json_status_and_custom($response, 1, $res[1]);
+});
+
+$app->post('/recover-password', function (Request $request, Response $response) use($sql_manager){
+
+    $args = (array)$request->getParsedBody();
+
+    $user_login = $args['userLogin'];
+
+    if(!check_params($user_login)) return add_json_status_and_comment($response, 0, DefaultMessages::E_WRONG_PARAMS);
+
+    $new_password = randomPassword(8);
+
+    $customer = $sql_manager->get_user_wrapper($user_login);
+    if(is_string($customer)) return add_json_status_and_comment($response, 0, $customer);
+    if (is_null($customer) or count($customer) == 0) return add_json_status_and_comment($response, 0, "User does not exist");
+
+    $res = $sql_manager->set_new_password($user_login, $new_password);
+
+    if ($res){
+        $mailer = new Mailer();
+        $res = $mailer->send_recovery_mail($customer['email'], $new_password);
+    }
+
+    return add_json_status($response, (int)$res);
+});
+
+$app->post('/change-password', function (Request $request, Response $response) use($sql_manager){
+
+    $args = (array)$request->getParsedBody();
+
+    $user_login = $args['userLogin'];
+    $new_password = $args['newPassword'];
+
+    if(!check_params($user_login)) return add_json_status_and_comment($response, 0, DefaultMessages::E_WRONG_PARAMS);
+
+    $customer = $sql_manager->get_user_wrapper($user_login);
+    if(is_string($customer)) return add_json_status_and_comment($response, 0, $customer);
+    if (is_null($customer) or count($customer) == 0) return add_json_status_and_comment($response, 0, "User does not exist");
+
+    $res = $sql_manager->set_new_password($user_login, $new_password);
+    if (is_bool($res))
+        return add_json_status($response, (int)$res);
+    return add_json_status_and_comment($response, 0, $res);
+
 });
 
 

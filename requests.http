@@ -38,11 +38,10 @@ POST http://127.0.0.1/todo/public/register
 Content-Type: application/json
 
 {
-"userLogin": "cont#3",
+"userLogin": "cont#4",
 "userPassword": "123",
-"userEmail": "kek@gmail.com",
+"userEmail": "bogicul2002@yandex.ru",
 "userType": "contractor"
-
 }
 
 ###
@@ -151,6 +150,15 @@ Content-Type: application/json
 {
   "userLogin": "work_cont",
   "taskTitle": "work_task#2"
+}
+
+###
+
+POST http://127.0.0.1/todo/public/recover-password
+Content-Type: application/json
+
+{
+  "userLogin": "cont#4"
 }
 
 ###
