@@ -12,12 +12,13 @@ API доступен по адресу url/[action].
 7. [Check if user is in the team](#check-if-user-is-in-the-team)
 8. [Get task](#get-task)
 9. [Get all tasks for contractor](#get-all-tasks-for-contractor)
-10. [Assign team for contractor](#assign-team-for-contractor)
-11. [Change status of the task](#change-status-of-the-task)
-12. [Delete the contractor from the team](#delete-the-contractor-from-the-team)
-13. [Get contractors of the customer](#get-contractors-of-the-customer)
-14. [Recover password](#recover-password)
-15. [Change password](#change-password)
+10. [Get all teams for contractor](#get-all-teams-for-contractor)
+11. [Assign team for contractor](#assign-team-for-contractor)
+12. [Change status of the task](#change-status-of-the-task)
+13. [Delete the contractor from the team](#delete-the-contractor-from-the-team)
+14. [Get contractors of the customer](#get-contractors-of-the-customer)
+15. [Recover password](#recover-password)
+16. [Change password](#change-password)
 
 ### Setup
 All requests return __json__ answer
@@ -201,6 +202,24 @@ or
 #### Request
 ```http request
 POST http://<url>/get-tasks
+Content-Type: application/json
+
+{
+  "userLogin": "contractor login"
+}
+```
+#### Return
+```json
+{
+  "status": 1,
+  "data": array
+}
+```
+
+### Get all teams for contractor
+#### Request
+```http request
+POST http://<url>/get-contractor-teams
 Content-Type: application/json
 
 {

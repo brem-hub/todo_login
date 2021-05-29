@@ -1,6 +1,8 @@
 <?php /** @noinspection SqlResolve */
 
 
+use JetBrains\PhpStorm\ArrayShape;
+
 class SqlManager
 {
     //TODO: remove type for compatibility with PHP7.2
@@ -30,7 +32,6 @@ class SqlManager
      */
     function get_user($username)
     {
-
         $query = self::query_set_table_names('SELECT * from __l_users__ WHERE login = :login');
 
         $params = [
@@ -38,25 +39,23 @@ class SqlManager
         ];
 
         return $this->execute_sql_select($query, $params);
-        /*$stmt = $this->connection->prepare($query);
-
-        if ($stmt->execute($params))
-            return array(true, $stmt->fetchAll(PDO::FETCH_ASSOC));
-
-        return array(false, $stmt->errorInfo());*/
     }
 
 
     // Rework totally, no need to this ternary check, anyway we check type after - no reason to check it here.
-    //checked
     public function get_user_wrapper($username)
     {
         $user = $this->get_user($username);
         return $user[0] ? $user[1][0] : $user[1];
     }
 
-    //checked
-    public function get_user_by_id($user_id){
+    /**
+     * Get user by id
+     * @param string|int $user_id user id
+     * @return array (true, user) or (false, error)
+     */
+    public function get_user_by_id($user_id)
+    {
         $query = self::query_set_table_names('SELECT * from __l_users__ WHERE id = :id');
         $params = [
             ":id" => $user_id
@@ -81,7 +80,6 @@ class SqlManager
         return $this->execute_sql_select($query, $params);
     }
 
-
     //checked
     public function get_team_wrapper($team_name)
     {
@@ -90,8 +88,37 @@ class SqlManager
         return $team[0] ? $team[1][0] : $team[1];
     }
 
+    public function get_team_by_id($team_id){
+        $query = self::query_set_table_names('SELECT * from __l_teams__ WHERE id = :id');
 
-    private function get_task($task_name){
+        $params = [
+            ":id" => $team_id
+        ];
+        return $this->execute_sql_select($query, $params);
+    }
+
+    /**
+     *
+     * @param string|int $task_id id of the task
+     * @return array (true, task_info) or (false, errorInfo)
+     */
+    #[ArrayShape([
+        'status' => 'bool',
+        'data' => 'mixed'
+    ])]
+    private function get_task_by_id($task_id)
+    {
+        $query = self::query_set_table_names('SELECT * from __l_tasks__ WHERE id = :id');
+
+        $params = [
+            ":id" => $task_id
+        ];
+
+        return $this->execute_sql_select($query, $params);
+    }
+
+    private function get_task($task_name)
+    {
         $query = self::query_set_table_names('SELECT * from __l_tasks__ WHERE title = :title');
 
         $params = [
@@ -101,7 +128,8 @@ class SqlManager
     }
 
     //checked
-    function get_task_wrapper($task_title){
+    function get_task_wrapper($task_title)
+    {
         $task = $this->get_task($task_title);
 
         return $task[0] ? $task[1][0] : $task[1];
@@ -110,7 +138,7 @@ class SqlManager
     function get_tasks($username)
     {
         $contractor = $this->get_user_wrapper($username);
-        if(is_string($contractor)) return $contractor;
+        if (is_string($contractor)) return $contractor;
         if (is_null($contractor) or count($contractor) == 0) return "Contractor does not exist";
 
 
@@ -120,7 +148,26 @@ class SqlManager
             ":login" => $contractor['id']
         ];
 
-        return $this->execute_sql_select($query, $params);
+        $pre_results = $this->execute_sql_select($query, $params);
+
+        if ($pre_results[0] === false)
+            return $pre_results;
+
+        $parsed_tasks = array();
+
+        foreach ($pre_results[1] as $pre_result) {
+            $task = $this->get_task_by_id($pre_result["task"]);
+            $contractor = $this->get_user_by_id($pre_result["contractor"]);
+            if ($task[0]) {
+                if ($contractor[0])
+                    $parsed_tasks[] = array("task" => $task[1][0], "contractor" => $contractor[1]);
+                else
+                    $parsed_tasks[] = array("task" => $task[1][0], "contractor" => $pre_result["contractor"]);
+
+            } else
+                $parsed_tasks[] = null;
+        }
+        return array(true, $parsed_tasks);
     }
 
     /**
@@ -159,7 +206,7 @@ class SqlManager
     function create_task($owner_login, $task_info)
     {
         $owner = $this->get_user_wrapper($owner_login);
-        if(is_string($owner)) return $owner;
+        if (is_string($owner)) return $owner;
         if (is_null($owner) or count($owner) == 0) return "Customer does not exist";
 
         if ($owner['type'] != "customer")
@@ -206,7 +253,7 @@ class SqlManager
     function create_team($owner_login, $team_info)
     {
         $owner = $this->get_user_wrapper($owner_login);
-        if(is_string($owner)) return $owner;
+        if (is_string($owner)) return $owner;
         if (is_null($owner) or count($owner) == 0) return "Customer does not exist";
 
         if ($owner['type'] != "customer")
@@ -230,15 +277,14 @@ class SqlManager
     }
 
 
-
     public function check_user_in_team($user_login, $team_title)
     {
         $contractor = $this->get_user_wrapper($user_login);
-        if(is_string($contractor)) return $contractor;
+        if (is_string($contractor)) return $contractor;
         if (is_null($contractor) or count($contractor) == 0) return "Contractor does not exist";
 
         $team = $this->get_team_wrapper($team_title);
-        if(is_string($team)) return $team;
+        if (is_string($team)) return $team;
         if (is_null($team) or count($team) == 0) return "Team does not exist";
 
         $query = self::query_set_table_names("SELECT * FROM __l_cont_teams__ WHERE contractor = :login AND team = :team");
@@ -258,9 +304,8 @@ class SqlManager
         return count($data) > 0;
     }
 
-    public function check_user_has_task($contractor, $task){
-
-
+    public function check_user_has_task($contractor, $task)
+    {
         $query = self::query_set_table_names("SELECT * FROM __l_cont_tasks__ WHERE contractor = :login AND task = :task");
 
         $params = [
@@ -280,11 +325,11 @@ class SqlManager
     public function assign_contractor_to_team($user_login, $team_title)
     {
         $contractor = $this->get_user_wrapper($user_login);
-        if(is_string($contractor)) return $contractor;
+        if (is_string($contractor)) return $contractor;
         if (is_null($contractor) or count($contractor) == 0) return "Contractor does not exist";
 
         $team = $this->get_team_wrapper($team_title);
-        if(is_string($team)) return $team;
+        if (is_string($team)) return $team;
         if (is_null($team) or count($team) == 0) return "Team does not exist";
 
 
@@ -308,12 +353,43 @@ class SqlManager
         return true;
     }
 
-    public function check_user_in_customer_team($user, $customer_id){
+    public function get_teams_for_user($username)
+    {
+        $contractor = $this->get_user_wrapper($username);
+        if (is_string($contractor)) return $contractor;
+        if (is_null($contractor) or count($contractor) == 0) return "Contractor does not exist";
+
+        $query = self::query_set_table_names("SELECT DISTINCT * FROM __l_cont_teams__ WHERE `contractor` = :contractor_id");
+
+        $params = [
+            ":contractor_id" => $contractor["id"]
+        ];
+
+        $teams_res = $this->execute_sql_select($query, $params);
+        if($teams_res[0] == false){
+            return $teams_res;
+        }
+
+        $teams = array();
+
+        foreach ($teams_res[1] as $team_res){
+            $team = $this->get_team_by_id($team_res["team"]);
+            if ($team[0])
+                $teams[] = $team[1][0];
+            else
+                $teams[] = null;
+        }
+
+        return array(true, $teams);
+    }
+
+    public function check_user_in_customer_team($user, $customer_id)
+    {
         $teams = $this->get_customer_teams_by_id($customer_id);
         if ($teams[0] == false)
             return false;
 
-        foreach ($teams[1] as $team){
+        foreach ($teams[1] as $team) {
             if ($this->check_user_in_team($user['login'], $team['title']) === true)
                 return true;
         }
@@ -323,12 +399,12 @@ class SqlManager
     public function assign_contractor_to_task($user_login, $task_title)
     {
         $contractor = $this->get_user_wrapper($user_login);
-        if(is_string($contractor)) return $contractor;
+        if (is_string($contractor)) return $contractor;
         if (is_null($contractor) or count($contractor) == 0) return "Contractor does not exist";
 
         $task = $this->get_task_wrapper($task_title);
-        if(is_string($task)) return $task;
-        if(is_null($task) or count($task) == 0) return "Task does not exist";
+        if (is_string($task)) return $task;
+        if (is_null($task) or count($task) == 0) return "Task does not exist";
 
 
         $flag = $this->check_user_has_task($contractor, $task);
@@ -382,12 +458,12 @@ class SqlManager
     public function delete_contractor_from_team($user_login, $team_title)
     {
         $contractor = $this->get_user_wrapper($user_login);
-        if(is_string($contractor)) return $contractor;
+        if (is_string($contractor)) return $contractor;
         if (is_null($contractor) or count($contractor) == 0) return "Contractor does not exist";
 
 
         $team = $this->get_team_wrapper($team_title);
-        if(is_string($team)) return $team;
+        if (is_string($team)) return $team;
         if (is_null($team) or count($contractor) == 0) return "Team does not exist";
 
         $query = self::query_set_table_names("DELETE FROM __l_cont_teams__ WHERE contractor= :login AND team= :team");
@@ -407,10 +483,10 @@ class SqlManager
     }
 
 
-
-    public function get_customer_teams($customer_login){
+    public function get_customer_teams($customer_login)
+    {
         $customer = $this->get_user_wrapper($customer_login);
-        if(is_string($customer)) return array(false, $customer);
+        if (is_string($customer)) return array(false, $customer);
         if (is_null($customer) or count($customer) == 0) return array(false, "Customer does not exist");
 
         $query = self::query_set_table_names('SELECT id FROM __l_teams__ WHERE owner= :login');
@@ -421,21 +497,28 @@ class SqlManager
         return $this->execute_sql_select($query, $params);
     }
 
-    private function get_customer_teams_by_id($customer_id){
-        $customer = $this->get_user_by_id($customer_id);
-        if(is_string($customer)) return array(false, $customer);
-        if (is_null($customer) or count($customer) == 0) return array(false, "Customer does not exist");
+    private function get_customer_teams_by_id($customer_id, $check = true)
+    {
+        if ($check)
+        {
+            $customer = $this->get_user_by_id($customer_id);
+            if (is_string($customer)) return array(false, $customer);
+            if (is_null($customer) or count($customer) == 0) return array(false, "Customer does not exist");
+        }
 
         $query = self::query_set_table_names('SELECT * FROM __l_teams__ WHERE owner= :login');
         $params = [
-            ":login" => $customer[1][0]['id'],
+            ":login" => $customer_id,
         ];
 
         return $this->execute_sql_select($query, $params);
     }
 
 
-    private function get_contractors_for_team($team){
+
+
+    private function get_contractors_for_team($team)
+    {
 
         // Team MUST BE
 
@@ -448,7 +531,7 @@ class SqlManager
         if ($res[0] == false) return array();
 
         $users = array();
-        foreach ($res[1] as $cont){
+        foreach ($res[1] as $cont) {
             //TODO: bad zone
             $users[] = $this->get_user_by_id($cont['contractor'])[1][0];
         }
@@ -467,9 +550,9 @@ class SqlManager
         if ($teams[0] == false) return array(false, $teams[1]);
         $teams = $teams[1];
         $contractors_arr = array();
-        foreach ($teams as $team){
+        foreach ($teams as $team) {
             $contractors = $this->get_contractors_for_team($team);
-            foreach ($contractors as $contractor){
+            foreach ($contractors as $contractor) {
                 if (!in_array($contractor, $contractors_arr))
                     $contractors_arr[] = $contractor;
             }
@@ -478,7 +561,8 @@ class SqlManager
         return array(true, $contractors_arr);
     }
 
-    public function set_new_password($user_login, $new_password){
+    public function set_new_password($user_login, $new_password)
+    {
 
         $query = self::query_set_table_names('UPDATE __l_users__ SET hashed_password = :password WHERE login = :login');
 
@@ -500,9 +584,14 @@ class SqlManager
     /**
      * @param $query
      * @param $params
-     * @return array
+     * @return array (true, fetched_data) or (false, errorInfo)
      */
-    public function execute_sql_select($query, $params){
+    #[ArrayShape([
+        'status[0]' => 'bool',
+        'data/error[1]' => 'mixed',
+    ])]
+    public function execute_sql_select($query, $params)
+    {
 
         $stmt = $this->connection->prepare($query);
 
@@ -532,6 +621,7 @@ class SqlManager
     const LOGIN_CONTR_TASKS = "login_contractor_task";
     const LOGIN_CONTR_TEAM = "login_contractor_team";
     const DB_DT_FORMAT = "Y-m-d H:i:s";
+
 
 
 }

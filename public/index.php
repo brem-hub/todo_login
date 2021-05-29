@@ -18,7 +18,7 @@ $app->setBasePath('/todo/public');
 $app->addBodyParsingMiddleware();
 $app->addRoutingMiddleware();
 
-$app->post('/login', function (Request $request, Response $response) use($sql_manager){
+$app->post('/login', function (Request $request, Response $response) use ($sql_manager) {
 
     $args = (array)$request->getParsedBody();
 
@@ -29,7 +29,7 @@ $app->post('/login', function (Request $request, Response $response) use($sql_ma
         return add_json_status_and_comment($response, 0, DefaultMessages::E_WRONG_PARAMS);
 
     $user = $sql_manager->get_user_wrapper($login);
-    if(is_string($user)) return add_json_status_and_comment($response, 0, $user);
+    if (is_string($user)) return add_json_status_and_comment($response, 0, $user);
     if (is_null($user) or count($user) == 0) return add_json_status_and_comment($response, 0, DefaultMessages::E_NO_USER);
 
     $hashed_password = $user['hashed_password'];
@@ -39,7 +39,7 @@ $app->post('/login', function (Request $request, Response $response) use($sql_ma
     return add_json_status_and_comment($response, 0, DefaultMessages::E_WRONG_PASS);
 });
 
-$app->post('/register', function (Request $request, Response $response) use($sql_manager){
+$app->post('/register', function (Request $request, Response $response) use ($sql_manager) {
 
     $args = (array)$request->getParsedBody();
 
@@ -53,20 +53,20 @@ $app->post('/register', function (Request $request, Response $response) use($sql
 
 
     $user = $sql_manager->get_user_wrapper($login);
-    if(is_string($user)) return add_json_status_and_comment($response, 0, $user);
+    if (is_string($user)) return add_json_status_and_comment($response, 0, $user);
     if (!is_null($user) and count($user) != 0) return add_json_status_and_comment($response, 0, DefaultMessages::E_USER_EXISTS);
 
     $hash = password_hash($password, PASSWORD_DEFAULT);
 
     $res = $sql_manager->register_user($login, $hash, array('email' => $email, 'type' => $user_type));
 
-    if($res !== true)
+    if ($res !== true)
         return add_json_status_and_comment($response, 0, $res);
 
     return add_json_status($response, 1);
 });
 
-$app->post('/create-task', function (Request $request, Response $response) use($sql_manager) {
+$app->post('/create-task', function (Request $request, Response $response) use ($sql_manager) {
     $params = (array)$request->getParsedBody();
 
     $customer_login = $params['customerLogin'];
@@ -83,7 +83,7 @@ $app->post('/create-task', function (Request $request, Response $response) use($
 });
 
 
-$app->post('/assign-task', function (Request $request, Response $response) use($sql_manager) {
+$app->post('/assign-task', function (Request $request, Response $response) use ($sql_manager) {
     $params = (array)$request->getParsedBody();
 
     $task_title = $params['taskTitle'];
@@ -100,18 +100,17 @@ $app->post('/assign-task', function (Request $request, Response $response) use($
 });
 
 
-
-$app->post('/create-team', function (Request $request, Response $response) use($sql_manager){
+$app->post('/create-team', function (Request $request, Response $response) use ($sql_manager) {
 
     $args = (array)$request->getParsedBody();
 
     $team_info = $args['teamInfo'];
     $customer = $args['customerLogin'];
 
-    if(!check_params($team_info, $customer)) return add_json_status_and_comment($response, 0, DefaultMessages::E_WRONG_PARAMS);
+    if (!check_params($team_info, $customer)) return add_json_status_and_comment($response, 0, DefaultMessages::E_WRONG_PARAMS);
 
 
-    $res = $sql_manager->create_team($customer,$team_info);
+    $res = $sql_manager->create_team($customer, $team_info);
 
     if ($res !== true)
         return add_json_status_and_comment($response, 0, $res);
@@ -119,23 +118,24 @@ $app->post('/create-team', function (Request $request, Response $response) use($
         return add_json_status($response, 1);
 });
 
-$app->post('/check-team', function (Request $request, Response $response) use($sql_manager){
-   $args = (array)$request->getParsedBody();
+$app->post('/check-team', function (Request $request, Response $response) use ($sql_manager) {
+    $args = (array)$request->getParsedBody();
+    var_dump("teast");
 
-   $username = $args['userLogin'];
-   $team = $args['teamTitle'];
+    $username = $args['userLogin'];
+    $team = $args['teamTitle'];
 
-   if (!check_params($username, $team)) return add_json_status_and_comment($response, 0, DefaultMessages::E_WRONG_PARAMS);
+    if (!check_params($username, $team)) return add_json_status_and_comment($response, 0, DefaultMessages::E_WRONG_PARAMS);
 
-   $res = $sql_manager->check_user_in_team($username, $team);
-   if (is_bool($res))
-       return add_json_status_and_custom($response, 1, array($res ? 1: 0));
-   else
-       return add_json_status_and_comment($response, 0, $res);
+    $res = $sql_manager->check_user_in_team($username, $team);
+    if (is_bool($res))
+        return add_json_status_and_custom($response, 1, array($res ? 1 : 0));
+    else
+        return add_json_status_and_comment($response, 0, $res);
 
 });
 
-$app->post('/get-task', function (Request $request, Response $response) use($sql_manager){
+$app->post('/get-task', function (Request $request, Response $response) use ($sql_manager) {
 
     $args = (array)$request->getParsedBody();
 
@@ -147,13 +147,23 @@ $app->post('/get-task', function (Request $request, Response $response) use($sql
     if (is_string($task)) return add_json_status_and_comment($response, 0, $task);
     if (is_null($task) or count($task) == 0) return add_json_status_and_comment($response, 0, "Task does not exist");
 
-    return add_json_status_and_custom($response, 1, array(array_values($task)));
-    /*$response->getBody()->write(json_encode(array_values($task)));
-    return $response;*/
+    return add_json_status_and_custom($response, 1, $task);
 });
 
+$app->post('/get-contractor-teams', function (Request $request, Response $response) use ($sql_manager){
+    $args = (array)$request->getParsedBody();
 
-$app->post('/get-tasks', function (Request $request, Response $response) use($sql_manager){
+    $username = $args['userLogin'];
+    if (!check_params($username)) return add_json_status_and_comment($response, 0, DefaultMessages::E_WRONG_PARAMS);
+
+    $teams = $sql_manager->get_teams_for_user($username);
+    if ($teams[0] == false) return add_json_status_and_comment($response, 0, $teams[1]);
+
+    if (count($teams[1]) == 0) return add_json_status_and_comment($response, 0, "Tasks not found");
+    return add_json_status_and_custom($response, 1, $teams[1]);
+});
+
+$app->post('/get-tasks', function (Request $request, Response $response) use ($sql_manager) {
 
     $args = (array)$request->getParsedBody();
 
@@ -164,12 +174,11 @@ $app->post('/get-tasks', function (Request $request, Response $response) use($sq
     if ($tasks[0] == false) return add_json_status_and_comment($response, 0, $tasks[1]);
 
     if (count($tasks[1]) == 0) return add_json_status_and_comment($response, 0, "Tasks not found");
+
     return add_json_status_and_custom($response, 1, $tasks[1]);
-   /* $response->getBody()->write(json_encode(array_values($tasks[1])));
-    return $response;*/
 });
 
-$app->post('/assign-team', function (Request $request, Response $response) use ($sql_manager){
+$app->post('/assign-team', function (Request $request, Response $response) use ($sql_manager) {
 
     $args = (array)$request->getParsedBody();
 
@@ -185,42 +194,42 @@ $app->post('/assign-team', function (Request $request, Response $response) use (
     return add_json_status($response, 1);
 });
 
-$app->post('/change-status', function (Request $request, Response $response) use($sql_manager){
+$app->post('/change-status', function (Request $request, Response $response) use ($sql_manager) {
 
     $args = (array)$request->getParsedBody();
 
     $task_name = $args['taskTitle'];
     $status = $args['newStatus'];
 
-    if(!check_params($task_name, $status)) return add_json_status_and_comment($response, 0, DefaultMessages::E_WRONG_PARAMS);
+    if (!check_params($task_name, $status)) return add_json_status_and_comment($response, 0, DefaultMessages::E_WRONG_PARAMS);
 
-    $res =$sql_manager->change_task_type($task_name, $status);
+    $res = $sql_manager->change_task_type($task_name, $status);
     if (is_string($res)) return add_json_status_and_comment($response, 0, $res);
 
     return add_json_status_and_custom($response, 1, array((int)$res));
 });
 
-$app->post('/delete-cont-team', function (Request $request, Response $response) use($sql_manager){
+$app->post('/delete-cont-team', function (Request $request, Response $response) use ($sql_manager) {
 
     $args = (array)$request->getParsedBody();
 
     $user_login = $args['userLogin'];
     $team_title = $args['teamTitle'];
 
-    if(!check_params($user_login, $team_title)) return add_json_status_and_comment($response, 0, DefaultMessages::E_WRONG_PARAMS);
+    if (!check_params($user_login, $team_title)) return add_json_status_and_comment($response, 0, DefaultMessages::E_WRONG_PARAMS);
 
     $res = $sql_manager->delete_contractor_from_team($user_login, $team_title);
     if (is_string($res)) return add_json_status_and_comment($response, 0, $res);
     return add_json_status_and_custom($response, 1, array((int)$res));
 });
 
-$app->post('/contractors-by-customer', function (Request $request, Response $response) use($sql_manager){
+$app->post('/contractors-by-customer', function (Request $request, Response $response) use ($sql_manager) {
 
     $args = (array)$request->getParsedBody();
 
     $user_login = $args['userLogin'];
 
-    if(!check_params($user_login)) return add_json_status_and_comment($response, 0, DefaultMessages::E_WRONG_PARAMS);
+    if (!check_params($user_login)) return add_json_status_and_comment($response, 0, DefaultMessages::E_WRONG_PARAMS);
 
     $res = $sql_manager->get_contractors_for_customer($user_login);
     if ($res[0] == false) return add_json_status_and_comment($response, 0, $res[1]);
@@ -228,23 +237,24 @@ $app->post('/contractors-by-customer', function (Request $request, Response $res
     return add_json_status_and_custom($response, 1, $res[1]);
 });
 
-$app->post('/recover-password', function (Request $request, Response $response) use($sql_manager){
+$app->post('/recover-password', function (Request $request, Response $response) use ($sql_manager) {
 
     $args = (array)$request->getParsedBody();
 
     $user_login = $args['userLogin'];
 
-    if(!check_params($user_login)) return add_json_status_and_comment($response, 0, DefaultMessages::E_WRONG_PARAMS);
+    if (!check_params($user_login)) return add_json_status_and_comment($response, 0, DefaultMessages::E_WRONG_PARAMS);
 
     $new_password = randomPassword(8);
 
+    $hash = password_hash($new_password, PASSWORD_DEFAULT);
     $customer = $sql_manager->get_user_wrapper($user_login);
-    if(is_string($customer)) return add_json_status_and_comment($response, 0, $customer);
+    if (is_string($customer)) return add_json_status_and_comment($response, 0, $customer);
     if (is_null($customer) or count($customer) == 0) return add_json_status_and_comment($response, 0, "User does not exist");
 
-    $res = $sql_manager->set_new_password($user_login, $new_password);
+    $res = $sql_manager->set_new_password($user_login, $hash);
 
-    if ($res){
+    if ($res) {
         $mailer = new Mailer();
         $res = $mailer->send_recovery_mail($customer['email'], $new_password);
     }
@@ -252,32 +262,32 @@ $app->post('/recover-password', function (Request $request, Response $response) 
     return add_json_status($response, (int)$res);
 });
 
-$app->post('/change-password', function (Request $request, Response $response) use($sql_manager){
+$app->post('/change-password', function (Request $request, Response $response) use ($sql_manager) {
 
     $args = (array)$request->getParsedBody();
 
     $user_login = $args['userLogin'];
     $new_password = $args['newPassword'];
 
-    if(!check_params($user_login)) return add_json_status_and_comment($response, 0, DefaultMessages::E_WRONG_PARAMS);
+    if (!check_params($user_login)) return add_json_status_and_comment($response, 0, DefaultMessages::E_WRONG_PARAMS);
 
+
+    $hash = password_hash($new_password, PASSWORD_DEFAULT);
     $customer = $sql_manager->get_user_wrapper($user_login);
-    if(is_string($customer)) return add_json_status_and_comment($response, 0, $customer);
+    if (is_string($customer)) return add_json_status_and_comment($response, 0, $customer);
     if (is_null($customer) or count($customer) == 0) return add_json_status_and_comment($response, 0, "User does not exist");
 
-    $res = $sql_manager->set_new_password($user_login, $new_password);
+    $res = $sql_manager->set_new_password($user_login, $hash);
     if (is_bool($res))
         return add_json_status($response, (int)$res);
     return add_json_status_and_comment($response, 0, $res);
-
 });
 
 
-
 // Initiate application
-try{
+try {
     $app->run();
-}catch (Exception $e){
-    print "Exception occurred: " . $e->getMessage(). " " . $e->getFile(). ":" .$e->getLine() . "\n";
+} catch (Exception $e) {
+    print "Exception occurred: " . $e->getMessage() . " " . $e->getFile() . ":" . $e->getLine() . "\n";
     print $e->getTraceAsString();
 }

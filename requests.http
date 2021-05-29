@@ -1,4 +1,4 @@
-POST http://127.0.0.1/todo/public/login
+POST http://moonl.in/login_php/v2/public/login
 Content-Type: application/json
 
 {
@@ -16,7 +16,6 @@ Content-Type: application/json
   "userPassword": "123",
   "userEmail": "kek@gmail.com",
   "userType": "contractor"
-
 }
 
 ###
@@ -29,7 +28,6 @@ Content-Type: application/json
   "userPassword": "123",
   "userEmail": "kek@gmail.com",
   "userType": "contractor"
-
 }
 
 ###
@@ -38,10 +36,10 @@ POST http://127.0.0.1/todo/public/register
 Content-Type: application/json
 
 {
-"userLogin": "cont#4",
-"userPassword": "123",
-"userEmail": "bogicul2002@yandex.ru",
-"userType": "contractor"
+  "userLogin": "cont#4",
+  "userPassword": "123",
+  "userEmail": "bogicul2002@yandex.ru",
+  "userType": "contractor"
 }
 
 ###
@@ -65,11 +63,11 @@ POST http://127.0.0.1/todo/public/create-team
 Content-Type: application/json
 
 {
-"customerLogin": "work_customer",
-"teamInfo": {
-  "title": "work_team",
-  "description": "My fav team"
-}
+  "customerLogin": "work_customer",
+  "teamInfo": {
+    "title": "work_team",
+    "description": "My fav team"
+  }
 }
 
 ###
@@ -80,7 +78,16 @@ Content-Type: application/json
 
 {
   "userLogin": "keks",
-  "teamName": "TheBestTeam"
+  "teamTitle": "TheBestTeam"
+}
+
+###
+
+POST http://127.0.0.1/todo/public/get-task
+Content-Type: application/json
+
+{
+  "taskTitle": "work_task"
 }
 
 ###
@@ -89,7 +96,7 @@ POST http://127.0.0.1/todo/public/get-tasks
 Content-Type: application/json
 
 {
-  "userLogin": "keks"
+  "userLogin": "work_cont"
 }
 
 ###
@@ -164,4 +171,62 @@ Content-Type: application/json
 ###
 
 
+POST http://127.0.0.1/todo/public/change-password
+Content-Type: application/json
 
+{
+  "userLogin": "password_changer",
+  "newPassword": "111"
+}
+
+###
+
+POST http://127.0.0.1/todo/public/register
+Content-Type: application/json
+
+{
+  "userLogin": "password_changer",
+  "userPassword": "123",
+  "userEmail": "kek@gmail.com",
+  "userType": "contractor"
+}
+
+###
+
+POST http://127.0.0.1/todo/public/login
+Content-Type: application/json
+
+{
+  "userLogin": "password_changer",
+  "userPassword": "111"
+}
+
+###
+
+POST http://moonl.in/login_php/v2/public/get-task
+Content-Type: application/json
+
+{
+  "taskTitle": "123"
+}
+
+###
+
+POST http://moonl.in/login_php/v2/public/get-tasks
+Content-Type: application/json
+
+{
+  "userLogin": "ii"
+}
+
+###
+
+// ADD TO DOCUMENTATION
+POST http://moonl.in/login_php/v2/public/get-contractor-teams
+Content-Type: application/json
+
+{
+  "userLogin": "ii"
+}
+
+###
